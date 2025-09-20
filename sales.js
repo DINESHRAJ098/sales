@@ -1,0 +1,154 @@
+import React, { useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+
+const mockSalesData = [
+  { year: 2022, sales: 150000, profit: 45000 },
+  { year: 2023, sales: 180000, profit: 55000 },
+  { year: 2024, sales: 210000, profit: 60000 },
+];
+
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658'];
+
+const SalesChart = ({ data, type, threshold }) => {
+  const filteredData = data.filter(item => item.sales > threshold);
+
+  switch (type) {
+    case 'bar':
+      return (
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="year" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="sales" fill="#8884d8" />
+            <Bar dataKey="profit" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    case 'line':
+      return (
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="year" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="sales" stroke="#8884d8" activeDot={{ r: 8 }} />
+            <Line type="monotone" dataKey="profit" stroke="#82ca9d" />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    case 'pie':
+      const pieData = filteredData.map(item => ({ name: `Sales ${item.year}`, value: item.sales }));
+      return (
+        <ResponsiveContainer width="100%" height={400}>
+          <PieChart>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={150}
+              label
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      );
+    default:
+      return <div>Select a chart type.</div>;
+  }
+};
+
+const Dashboard = () => {
+  const [chartType, setChartType] = useState('bar');
+  const [threshold, setThreshold] = useState(0);
+
+  const handleThresholdChange = (event) => {
+    setThreshold(Number(event.target.value));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center">
+      <div className="w-full max-w-4xl bg-white p-6 rounded-2xl shadow-xl space-y-8">
+        <h1 className="text-4xl font-bold text-center text-gray-800">
+          Sales Dashboard
+        </h1>
+        <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <button
+            onClick={() => setChartType('bar')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${
+              chartType === 'bar'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Bar Chart
+          </button>
+          <button
+            onClick={() => setChartType('line')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${
+              chartType === 'line'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Line Chart
+          </button>
+          <button
+            onClick={() => setChartType('pie')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${
+              chartType === 'pie'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Pie Chart
+          </button>
+        </div>
+        <div className="flex flex-col items-center">
+          <label htmlFor="sales-threshold" className="text-gray-600 mb-2">
+            Filter by Minimum Sales Threshold
+          </label>
+          <input
+            id="sales-threshold"
+            type="number"
+            value={threshold}
+            onChange={handleThresholdChange}
+            className="w-full max-w-xs p-3 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g., 180000"
+          />
+        </div>
+        <div className="w-full bg-white p-4 rounded-lg shadow-inner">
+          <SalesChart data={mockSalesData} type={chartType} threshold={threshold} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
+// ...existing code...
