@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -23,6 +23,7 @@ const mockSalesData = [
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658'];
 
+// A single component to render all chart types based on props.
 const SalesChart = ({ data, type, threshold }) => {
   const filteredData = data.filter(item => item.sales > threshold);
 
@@ -56,6 +57,7 @@ const SalesChart = ({ data, type, threshold }) => {
         </ResponsiveContainer>
       );
     case 'pie':
+      // Recharts pie chart needs data in a specific format for "value"
       const pieData = filteredData.map(item => ({ name: `Sales ${item.year}`, value: item.sales }));
       return (
         <ResponsiveContainer width="100%" height={400}>
@@ -97,6 +99,8 @@ const Dashboard = () => {
         <h1 className="text-4xl font-bold text-center text-gray-800">
           Sales Dashboard
         </h1>
+
+        {/* Chart type controls */}
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             onClick={() => setChartType('bar')}
@@ -129,6 +133,8 @@ const Dashboard = () => {
             Pie Chart
           </button>
         </div>
+
+        {/* Custom Filter Input */}
         <div className="flex flex-col items-center">
           <label htmlFor="sales-threshold" className="text-gray-600 mb-2">
             Filter by Minimum Sales Threshold
@@ -142,6 +148,8 @@ const Dashboard = () => {
             placeholder="e.g., 180000"
           />
         </div>
+
+        {/* Chart Area */}
         <div className="w-full bg-white p-4 rounded-lg shadow-inner">
           <SalesChart data={mockSalesData} type={chartType} threshold={threshold} />
         </div>
@@ -151,4 +159,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-// ...existing code...
